@@ -1,5 +1,4 @@
 from fpdf import FPDF
-import tempfile
 import os
 import matplotlib.pyplot as plt
 from pdf2image import convert_from_path
