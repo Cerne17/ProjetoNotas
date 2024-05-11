@@ -16,3 +16,9 @@ pillow==10.2.0
 
 # Biblioteca para gerenciar dados sensíveis usando arquivos .env
 python-dotenv==1.0.1
+
+# Matplotlib usado para gerar pdf de LaTeX
+matplotlib==3.8.2
+
+# pdf2image para converter PDFs em imagens
+pdf2image==1.17.0
