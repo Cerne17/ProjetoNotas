@@ -75,15 +75,9 @@ print("Páginas Extraídas: ", PAGINAS)
 PAGINAS_TRANSCRITAS = []
 
 # Criando o Prompt:
-PROMPT_BASE = """Transcreva o conteúdo desta imagem de um caderno.
-Tente sempre seguir uma mesma formatação, padronização e evitar ao máximo adaptações, sendo o mais fidedígno ao texto original. 
-Note que essa transcrição será utilizada para gerar pdf usando python, então cada linha deverá ser separada por um caractere de nova linha '\\n'"""
-MARCADOR_DE_EQUACOES = "--latex-eq--"
 PROMPT_COM_EQUACOES = f"""Transcreva o conteúdo desta imagem de um caderno incluíndo equações.
 Tente sempre seguir uma mesma formatação, padronização e evitar ao máximo adaptações, sendo o mais fidedígno ao texto original.
 Caso haja equações, siga as seguintes regras:
-Em todas as linhas que incluam uma equação, separe a equação em uma linha para isso e inclua o marcador {
-    MARCADOR_DE_EQUACOES} no começo da linha.
     Todas equações devem ser expressas em códigos LaTeX.
     Note que essa transcrição será utilizada para gerar pdf usando python, então cada linha deverá ser separada por um caractere de nova linha '\\n'"""
 
