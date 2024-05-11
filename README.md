@@ -22,9 +22,15 @@ dinâmica materiais digitalizados de nossas mídias físicas!
 ## Pré-Requisitos:
 - Python 3.6 ou superior
 - Bibliotecas Python:
+    - google.generativeai
+    - sys
+    - os
     - FPDF
     - Pillow (PIL)
-    - pdflatex
+    - pdf2image
+    - matplotlib
+    - python-dotenv
+
 
 ## Instalação:
 1. Clone o Repositório: `git clone https://github.com/Cerne17/ProjetoNotas.git`
@@ -33,7 +39,10 @@ dinâmica materiais digitalizados de nossas mídias físicas!
 ## Uso:
 1. Tire fotos das notas a serem digitalizadas.
 2. Coloque todas as fotos, organizando-as por ordem numérica, dentro da pasta `imagens` do projeto
-3. Execute o script principal: `python main.py`
+3. Inclua sua chave da Google API
+    1. Note que disponibilizamos um exemplo de como seu arquivo `.env` deve ser para que o código funcione
+    2. Mas outra forma de se fazer seria substituir o valor da variável `GOOGLE_API_KEY` diretamente no arquivo `main.py` 
+3. Execute o script principal: `python main.py` ou `python3 main.py`
 
 ## Customização: 
 Sinta-se livre para mudar as configurações de fonte, tamanho da escrita, linhas por página.
