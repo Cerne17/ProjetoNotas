@@ -1,18 +1,23 @@
 from fpdf import FPDF
 import tempfile
 import os
+import matplotlib.pyplot as plt
+from pdf2image import convert_from_path
 
 
 class CriadorDePdf:
     def __init__(self,
                  paginas,
-                 marcador_equacao="--latex-eq--",
                  linhas_por_pagina=50):
-        self.marcador_equacao = marcador_equacao
         self.pdf = FPDF()
         self.linhas_por_pagina = linhas_por_pagina
         self.linhas_pagina_atual = 0
         self.paginas = paginas
+        self.caminho_pdf_temporario = "./output/temp.pdf"
+        self.caminho_png_temporario = "./output/temp.png"
+
+        self.fonte = "Arial"
+        self.tamanho_padrao = 12
 
     def adicionar_pagina_com_equacoes(self, texto):
         """
@@ -20,17 +25,17 @@ class CriadorDePdf:
         convertendo equações LaTeX em imagens.
         """
         self.pdf.add_page()
-        self.pdf.set_font("Arial", size=12)
+        self.pdf.set_font(self.fonte, size=self.tamanho_padrao)
         for linha in texto:
-            if linha.startswith(self.marcador_equacao):
+            if linha.find("$$") != -1:
                 # Extrair equação LaTeX
-                equacao = linha.replace(self.marcador_equacao, "").strip()
+                equacao = linha.strip()
                 # Criar imagem da equação
-                imagem_path = self.gerar_imagem_latex(equacao)
+                self.gerar_imagem_latex(equacao)
                 # Adicionar imagem ao PDF
-                self.pdf.image(imagem_path, w=50, h=10)
+                self.pdf.image(self.caminho_png_temporario, w=50, h=10)
                 # Remover imagem temporária
-                os.remove(imagem_path)
+                os.remove(self.caminho_png_temporario)
             else:
                 self.pdf.multi_cell(0, 5, str(linha), border=0, align='L')
             self.linhas_pagina_atual += 1
@@ -57,30 +62,17 @@ class CriadorDePdf:
         """
             Gera uma imagem a partir de uma eqação LaTeX.
         """
-        # Criar o arquivo temporário
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".tex") as f:
-            f.write("\\documentclass{article}\n")
-            f.write("\\usepackage{amsmath}\n")
-            f.write("\\pagestyle{empty}\n")
-            f.write("\\begin{document}\n")
-            f.write("$" + equacao + "$\n")
-            f.write("\\end{document}\n")
-            f.flush()
+        fig = plt.figure()
 
-        # Comiplar LaTeX para PDF
-        os.system(
-            "pdflatex -output-directory={} {}"
-            .format(os.path.dirname(f.name), f.name)
-        )
+        plt.axis("off")
+        plt.text(0.5, 0.5, f"${equacao}$", size=20, ha="center", va="center")
 
-        # Converter PDF para imagem
-        imagem_path = f.name[:-4] + ".png"
-        os.system(
-            "convert -density 300 {} -quality 90 {}"
-            .format(f.name[:-4] + ".pdf", imagem_path)
-        )
+        plt.savefig(self.caminho_pdf_temporario,
+                    bbox_inches="tight", pad_inches=0.1)
+        plt.close(fig)
 
-        return imagem_path
+        imagens = convert_from_path(self.caminho_pdf_temporario)
+        imagens[0].save(self.caminho_png_temporario, "PNG")
 
     def criar_pdf(self):
         """
@@ -90,7 +82,7 @@ class CriadorDePdf:
             self.linhas_pagina_atual = 0
             tem_equacao = False
             for linha in pagina:
-                if self.marcador_equacao in linha:
+                if linha.find("$$") != -1:
                     tem_equacao = True
                     break
             if tem_equacao:
