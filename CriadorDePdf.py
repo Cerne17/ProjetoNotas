@@ -17,6 +17,8 @@ class CriadorDePdf:
 
         self.fonte = "Arial"
         self.tamanho_padrao = 12
+        self.pagina_atual = 0
+        self.numero_total_de_paginas = len(paginas)
 
     def adicionar_pagina_com_equacoes(self, texto):
         """
@@ -27,14 +29,19 @@ class CriadorDePdf:
         self.pdf.set_font(self.fonte, size=self.tamanho_padrao)
         for linha in texto:
             if linha.find("$$") != -1:
-                # Extrair equação LaTeX
-                equacao = linha.strip()
-                # Criar imagem da equação
-                self.gerar_imagem_latex(equacao)
-                # Adicionar imagem ao PDF
-                self.pdf.image(self.caminho_png_temporario, w=50, h=10)
-                # Remover imagem temporária
-                os.remove(self.caminho_png_temporario)
+                try:
+                    # Extrair equação LaTeX
+                    while linha.find("$") != -1:
+                        linha.replace("$", "")
+                    equacao = f"${linha.strip()}$"
+                    # Criar imagem da equação
+                    self.gerar_imagem_latex(equacao)
+                    # Adicionar imagem ao PDF
+                    self.pdf.image(self.caminho_png_temporario, w=50, h=10)
+                    # Remover imagem temporária
+                    os.remove(self.caminho_png_temporario)
+                except:
+                    self.pdf.multi_cell(0, 5, str(linha), border=0, align='L')
             else:
                 self.pdf.multi_cell(0, 5, str(linha), border=0, align='L')
             self.linhas_pagina_atual += 1
@@ -69,6 +76,7 @@ class CriadorDePdf:
         plt.savefig(self.caminho_pdf_temporario,
                     bbox_inches="tight", pad_inches=0.1)
         plt.close(fig)
+        plt.close()
 
         imagens = convert_from_path(self.caminho_pdf_temporario)
         imagens[0].save(self.caminho_png_temporario, "PNG")
@@ -78,6 +86,8 @@ class CriadorDePdf:
         Adiciona todo o conteúdo ao PDF.
         """
         for pagina in self.paginas:
+            self.pagina_atual += 1
+            print(f"Digitalizando a página {self.pagina_atual} de {self.numero_total_de_paginas}")
             self.linhas_pagina_atual = 0
             tem_equacao = False
             for linha in pagina:
