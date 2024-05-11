@@ -1,0 +1,18 @@
+# Biblioteca para gerar PDFs
+fpdf==1.7.2
+
+# Bibliotecas para utilização das APIs do Google
+google-ai-generativelanguage==0.6.2
+google-api-core==2.19.0
+google-api-python-client==2.128.0
+google-auth==2.29.0
+google-auth-httplib2==0.2.0
+google-generativeai==0.5.2
+google-pasta==0.2.0
+googleapis-common-protos==1.63.0
+
+# Biblioteca para manipular imagens durante a requisição do Gemini
+pillow==10.2.0
+
+# Biblioteca para gerenciar dados sensíveis usando arquivos .env
+python-dotenv==1.0.1
