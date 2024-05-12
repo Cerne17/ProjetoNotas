@@ -27,7 +27,6 @@ dinâmica materiais digitalizados de nossas mídias físicas!
     - os
     - FPDF
     - Pillow (PIL)
-    - pdf2image
     - matplotlib
     - python-dotenv
 
@@ -43,6 +42,10 @@ dinâmica materiais digitalizados de nossas mídias físicas!
     1. Note que disponibilizamos um exemplo de como seu arquivo `.env` deve ser para que o código funcione
     2. Mas outra forma de se fazer seria substituir o valor da variável `GOOGLE_API_KEY` diretamente no arquivo `main.py` 
 3. Execute o script principal: `python main.py` ou `python3 main.py`
+4. Note que todos arquivos devem ter mesmo tamanho de nome para a ordenação funcionar como esperado. Ou seja:
+    1. Se precisar do pdf de `1432` páginas, todos arquivos devem ter nome com `4` dígitos: `0001.png`, `0012.png`, `0123.jpg`, ...
+    2. Se precisar do pdf de `14` páginas, todos arquivos devem ter nome com `2` dígitos: `01.png`, `09.png`, `12.jpg`, ...
+    3. E assim por diante.
 
 ## Customização: 
 Sinta-se livre para mudar as configurações de fonte, tamanho da escrita, linhas por página.
