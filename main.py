@@ -58,6 +58,10 @@ def extrair_paginas():
     if len(CAMINHO_PAGINAS) == 0:
         sys.exit("Nenhuma imagem válida foi encontrada. Certifique-se de que as imagens estão no diretório 'imagens' e que são dos tipos: '.png', '.jpg', '.jpeg'.")
 
+    CAMINHO_PAGINAS = sorted(CAMINHO_PAGINAS)
+
+    print("Caminhos Extraídos Ordenados: ", CAMINHO_PAGINAS)
+
 
 def traduzir_imagens(CAMINHO_PAGINAS):
     global PAGINAS
