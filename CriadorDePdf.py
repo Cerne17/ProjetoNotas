@@ -1,7 +1,7 @@
 from fpdf import FPDF
 import os
 import matplotlib.pyplot as plt
-from pdf2image import convert_from_path
+import matplotlib
 
 
 class CriadorDePdf:
@@ -12,13 +12,16 @@ class CriadorDePdf:
         self.linhas_por_pagina = linhas_por_pagina
         self.linhas_pagina_atual = 0
         self.paginas = paginas
-        self.caminho_pdf_temporario = "./output/temp.pdf"
-        self.caminho_png_temporario = "./output/temp.png"
+        self.caminho_png_temporario = "./output/temp"
 
         self.fonte = "Arial"
         self.tamanho_padrao = 12
         self.pagina_atual = 0
         self.numero_total_de_paginas = len(paginas)
+        self.contador_de_imagens = 0
+
+        # Usa o Backend Agg para não usarmos a interface gráfica do matplotlib
+        matplotlib.use("Agg")
 
     def adicionar_pagina_com_equacoes(self, texto):
         """
@@ -27,19 +30,23 @@ class CriadorDePdf:
         """
         self.pdf.add_page()
         self.pdf.set_font(self.fonte, size=self.tamanho_padrao)
+        self.contador_de_imagens = 0
         for linha in texto:
             if linha.find("$$") != -1:
                 try:
                     # Extrair equação LaTeX
                     while linha.find("$") != -1:
-                        linha.replace("$", "")
+                        linha = linha.replace("$", "")
                     equacao = f"${linha.strip()}$"
                     # Criar imagem da equação
-                    self.gerar_imagem_latex(equacao)
+                    self.contador_de_imagens += 1
+                    caminho_png_temporario = f"{self.caminho_png_temporario}{
+                        self.contador_de_imagens}.png"
+                    self.gerar_imagem_latex(equacao, caminho_png_temporario)
                     # Adicionar imagem ao PDF
-                    self.pdf.image(self.caminho_png_temporario, w=50, h=10)
+                    self.pdf.image(caminho_png_temporario, h=50)
                     # Remover imagem temporária
-                    os.remove(self.caminho_png_temporario)
+                    os.remove(caminho_png_temporario)
                 except:
                     self.pdf.multi_cell(0, 5, str(linha), border=0, align='L')
             else:
@@ -64,22 +71,19 @@ class CriadorDePdf:
                 self.linhas_pagina_atual = 0
                 self.pdf.add_page()
 
-    def gerar_imagem_latex(self, equacao):
+    def gerar_imagem_latex(self, equacao, caminho_png):
         """
-            Gera uma imagem a partir de uma eqação LaTeX.
+            Gera uma imagem a partir de uma equação LaTeX.
         """
         fig = plt.figure()
 
+        print(equacao)
         plt.axis("off")
-        plt.text(0.5, 0.5, f"${equacao}$", size=20, ha="center", va="center")
+        plt.text(0.5, 0.5, equacao, size=20, ha="center", va="center")
 
-        plt.savefig(self.caminho_pdf_temporario,
-                    bbox_inches="tight", pad_inches=0.1)
+        plt.savefig(caminho_png, format="png",
+                    bbox_inches="tight", pad_inches=0, dpi=300)
         plt.close(fig)
-        plt.close()
-
-        imagens = convert_from_path(self.caminho_pdf_temporario)
-        imagens[0].save(self.caminho_png_temporario, "PNG")
 
     def criar_pdf(self):
         """
@@ -87,16 +91,23 @@ class CriadorDePdf:
         """
         for pagina in self.paginas:
             self.pagina_atual += 1
-            print(f"Digitalizando a página {self.pagina_atual} de {self.numero_total_de_paginas}")
+            linha_atual = 0
+            print(f"Digitalizando a página {self.pagina_atual} de {
+                  self.numero_total_de_paginas}")
             self.linhas_pagina_atual = 0
             tem_equacao = False
             for linha in pagina:
+                linha_atual += 1
                 if linha.find("$$") != -1:
                     tem_equacao = True
                     break
             if tem_equacao:
+                print(f"Digitalizando a linha {
+                      linha_atual} -> Linha com equação")
                 self.adicionar_pagina_com_equacoes(pagina)
             else:
+                print(f"Digitalizando a linha {
+                      linha_atual} -> Linha sem equação")
                 self.adicionar_pagina_comum(pagina)
 
         # Salvar o PDF com o nome genérico "caderno.pdf" na pastar ./output/
