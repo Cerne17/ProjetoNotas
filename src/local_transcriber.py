@@ -47,9 +47,13 @@ class LocalTranscriber:
 
         self.prompt = """Transcreva o conteúdo desta imagem de um caderno.
 Tente sempre seguir uma mesma formatação, padronização e evitar ao máximo adaptações, sendo o mais fidedígno ao texto original. Mantenha sempre o idioma original do texto.
-Caso haja equações, siga as seguintes regras:
-    Todas equações devem ser expressas em LaTeX, não há necessidade de configurar o arquivo LaTeX.
-    Note que essa transcrição será utilizada para gerar pdf usando python, então cada linha deverá ser separada por um caractere de nova linha '\\n'"""
+A saída deve ser formatada para ser inserida diretamente em um documento LaTeX.
+Regras:
+1. Texto comum deve ser transcrito normalmente.
+2. Equações matemáticas devem ser delimitadas por `$$...$$` para equações destacadas (display math) ou `$...$` para equações na linha (inline math).
+3. Não use ambientes como `\\begin{equation}` a menos que seja estritamente necessário.
+4. Não inclua preâmbulo LaTeX (como `\\documentclass`, `\\usepackage`), apenas o conteúdo do corpo do documento.
+5. Separe parágrafos com uma linha em branco."""
 
     def _ensure_model_exists(self):
         """Checks if model exists locally, otherwise downloads it."""
