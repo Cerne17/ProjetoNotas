@@ -1,8 +1,10 @@
+import argparse
+import logging
 import os
 import sys
-import logging
 from dotenv import load_dotenv
 from src.transcriber import Transcriber
+from src.local_transcriber import LocalTranscriber
 from src.pdf_creator import PdfCreator
 
 # Configure logging
@@ -10,13 +12,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def main():
-    load_dotenv()
-    api_key = os.getenv("GOOGLE_API_KEY")
-    
-    if not api_key:
-        logger.error("GOOGLE_API_KEY not found in environment variables.")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="ProjetoNotas - Digitize handwritten notes.")
+    parser.add_argument("--mode", choices=["gemini", "local"], default="gemini", help="Transcription mode: 'gemini' (API) or 'local' (LLaVA)")
+    args = parser.parse_args()
 
+    load_dotenv()
+    
     # Image Extraction
     image_dir = "imagens"
     if not os.path.exists(image_dir):
@@ -36,9 +37,22 @@ def main():
     logger.info(f"Found {len(image_paths)} images to process.")
 
     # Transcription
+    transcribed_pages = []
     try:
-        transcriber = Transcriber(api_key=api_key)
-        transcribed_pages = transcriber.transcribe_images(image_paths)
+        if args.mode == "gemini":
+            api_key = os.getenv("GOOGLE_API_KEY")
+            if not api_key:
+                logger.error("GOOGLE_API_KEY not found in environment variables.")
+                sys.exit(1)
+            logger.info("Using Gemini API for transcription.")
+            transcriber = Transcriber(api_key=api_key)
+            transcribed_pages = transcriber.transcribe_images(image_paths)
+        
+        elif args.mode == "local":
+            logger.info("Using Local LLaVA model for transcription.")
+            transcriber = LocalTranscriber()
+            transcribed_pages = transcriber.transcribe_images(image_paths)
+
         logger.info("Transcription completed.")
     except Exception as e:
         logger.error(f"Transcription failed: {e}")
